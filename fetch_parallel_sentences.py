@@ -10,8 +10,6 @@ def read_sentences(sentence_file):
             counter += 1
             if counter % 100000 == 0:
                 print("%i sentences read" % counter, end="\r")
-            elif counter > 73334784: # Only for swedish, remove afterwards
-                break
     return sentences
 
 def read_scores(score_file):
@@ -41,11 +39,11 @@ def get_nearest_target_sentences(target_sentences, score, number_of_sentences):
         nearest_target_sentences.append(nth_sentence)
     return nearest_target_sentences
 
-def find_parallel_sentences(output_file, score_file, source_sentences, target_sentences):
+def find_parallel_sentences(output_file, score_file, source_sentences, target_sentences, number_of_sentences):
     counter = 0
     for i, score in enumerate(read_scores(score_file)):
         margin_score = score[2]
-        nearest_target_sentences = get_nearest_target_sentences(target_sentences, score, 1)
+        nearest_target_sentences = get_nearest_target_sentences(target_sentences, score, number_of_sentences)
         source_sentence = source_sentences[i]
         write_to_file(output_file, margin_score, source_sentence, nearest_target_sentences)
         counter += 1
@@ -58,10 +56,11 @@ if __name__ == "__main__":
     argument_parser.add_argument("--source-sentences", help="File containing source language sentences")
     argument_parser.add_argument("--target-sentences", help="File containing target language sentences")
     argument_parser.add_argument("--output", help="Output file for parallel sentences")
+    arugment_parser.add_argument("--number-of-parallel-sentences", help="How many of the nearest neighbors you want to fetch 1-10")
     arguments = argument_parser.parse_args()
     
     source_sentences = read_sentences(arguments.source_sentences)
     print("Source sentences ready...")
     target_sentences = read_sentences(arguments.target_sentences)
     print("Target sentences ready...")
-    find_parallel_sentences(arguments.output, arguments.score_file, source_sentences, target_sentences)
+    find_parallel_sentences(arguments.output, arguments.score_file, source_sentences, target_sentences, int(arguments.number_of_parallel_sentences))
