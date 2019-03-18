@@ -1,12 +1,12 @@
 # fiskmo-parallel
 This repository contains scripts to find parallel sentences from large amount of text. 
 
-# <h2>Requirements</h2>
+## Requirements
 1. First you need to use Facebook research's [LASER](https://github.com/facebookresearch/LASER/tree/master/tasks/embed) library to embed your sentences. 
 2. Next you will need to download [FAISS](https://github.com/facebookresearch/faiss)
 3. [NumPy](numpy.org)
 
-# <h2>Steps</h2>
+## Steps
 1. Embed your text files using the [LASER](https://github.com/facebookresearch/LASER/tree/master/tasks/embed) library. Now you will have 1024 dimensional sentence vectors. This can take for a few days if you have tens of millions of sentences.
 2. Create FAISS index. The index I'm using is "OPQ32_128,IVF32768,PQ32". You can read more about those in the [FAISS wiki](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index). The embeddings you have gotten from LASER.
 ```
