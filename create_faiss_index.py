@@ -24,7 +24,7 @@ def get_embeddings_batch(embeddings_file, batch_size):
             batch_embeddings = numpy.stack(batch_embeddings, axis=0)
             yield batch_embeddings
             batch_count += 1
-            print("Batch number %i finished" % batch_count, end="\r") 
+            print("Batch number %i finished" % batch_count, end='\r')
             batch_embeddings = []
 
 
@@ -35,15 +35,15 @@ def add_embeddings_to_index(embeddings, gpu_index, batch_size):
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("--embedding-file", help="File containing sentence embeddings")
-    argparser.add_argument("--index-name", help="Index name to store")
+    argparser.add_argument("--embedding-file", help="File containing sentence embeddings", required=True)
+    argparser.add_argument("--index-name", help="Index name to store", required=True)
+    argparser.add_argument("--batch-size", help="Batch of embeddings to add to index", required=True)
+    argparser.add_argument("--training-size", help="Number of training embeddings", required=True, default=1500000)
     arguments = argparser.parse_args()
     
-    BATCH_SIZE = 8192
-    
     # We need between 983040 and 8388608 training vectors
-    TRAINING_SIZE = 1500000
-    training_embeddings = numpy.fromfile(arguments.embedding_file, numpy.float32, TRAINING_SIZE*DIMENSIONS)
+    training_size = int(arguments.training_size)
+    training_embeddings = numpy.fromfile(arguments.embedding_file, numpy.float32, training_size*DIMENSIONS)
     training_embeddings.resize(training_embeddings.shape[0] // DIMENSIONS, DIMENSIONS)
     
     print("%i training embeddings..." % training_embeddings.shape[0])
@@ -55,9 +55,10 @@ if __name__ == "__main__":
     gpu_index = faiss.index_cpu_to_all_gpus(index)
     print("Index created...")
     
+    batch_size = int(arguments.batch_size)
     gpu_index.train(training_embeddings)
     print("Index trained", gpu_index.is_trained)
-    add_embeddings_to_index(arguments.embedding_file, gpu_index, BATCH_SIZE)
+    add_embeddings_to_index(arguments.embedding_file, gpu_index, batch_size)
     print("%i embeddings in index" % gpu_index.ntotal)
 
     # Store index to a file
