@@ -56,7 +56,7 @@ if __name__ == "__main__":
     argument_parser.add_argument("--source-sentences", help="File containing source language sentences")
     argument_parser.add_argument("--target-sentences", help="File containing target language sentences")
     argument_parser.add_argument("--output", help="Output file for parallel sentences")
-    arugment_parser.add_argument("--number-of-parallel-sentences", help="How many of the nearest neighbors you want to fetch 1-10")
+    argument_parser.add_argument("--number-of-parallel-sentences", help="How many of the nearest neighbors you want to fetch 1-10")
     arguments = argument_parser.parse_args()
     
     source_sentences = read_sentences(arguments.source_sentences)
