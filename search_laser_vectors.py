@@ -4,7 +4,6 @@ import numpy
 import argparse
 
 DIMENSIONS = 1024
-K = 10
 
 def read_embeddings(embeddings_file):
     with open(embeddings_file, 'rb') as embedding_file:
@@ -26,28 +25,28 @@ def get_embeddings_batch(embeddings_file, batch_size):
             print("Batch number %i finished" % batch_count, end="\r") 
             batch_embeddings = []
 
-def search_embeddings_from_index(index, embeddings):
-    similarities, neighbor_ids = index.search(embeddings, K)
+def search_embeddings_from_index(index, embeddings, k):
+    similarities, neighbor_ids = index.search(embeddings, k)
     return similarities, neighbor_ids
 
-def margin(similarities):
-    means = numpy.sum(similarities[:, 1:], axis=1) / (K - 1)
+def margin(similarities, k):
+    means = numpy.sum(similarities[:, 1:], axis=1) / (k - 1)
     margin_scores = similarities[:, 0] / means
     return margin_scores
 
 
-def calculate_scores(index, embeddings_file, batch_size):
+def calculate_scores(index, embeddings_file, batch_size, k):
     current_index = 1
     for embedding_batch in get_embeddings_batch(embeddings_file, batch_size):
         faiss.normalize_L2(embedding_batch)
-        similarities, neighbor_ids = search_embeddings_from_index(index, embedding_batch)
-        margin_scores = margin(similarities)
+        similarities, neighbor_ids = search_embeddings_from_index(index, embedding_batch, k)
+        margin_scores = margin(similarities, k)
         current_embeddings_ids = range(current_index, current_index + batch_size)
         current_index += batch_size
         yield [similarities, neighbor_ids, margin_scores, current_embeddings_ids]  
         
-def write_results_to_file(output_file, index, embeddings_file, batch_size):
-    for scores in calculate_scores(index, embeddings_file, batch_size):
+def write_results_to_file(output_file, index, embeddings_file, batch_size, k):
+    for scores in calculate_scores(index, embeddings_file, batch_size, k):
         similarities = scores[0]
         neighbor_ids = scores[1]
         margin_scores = scores[2]
@@ -67,7 +66,9 @@ if __name__ == "__main__":
     argument_parser.add_argument("--embeddings", help="Embeddings for sentences")
     argument_parser.add_argument("--batch-size", help="Batch size for searching")
     argument_parser.add_argument("--output", help="Output file")
+    argument_parser.add_argument("--neighbors", help="Number of nearest neighbors")
     arguments = argument_parser.parse_args()
     index = faiss.read_index(arguments.index)
     index = faiss.index_cpu_to_all_gpus(index)
-    write_results_to_file(arguments.output, index, arguments.embeddings, int(arguments.batch_size))
+    k = int(arguments.neighbors)
+    write_results_to_file(arguments.output, index, arguments.embeddings, int(arguments.batch_size), k)
