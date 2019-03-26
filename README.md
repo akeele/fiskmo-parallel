@@ -16,9 +16,9 @@ $ python create_faiss_index.py --embedding-file EMBEDDINGS_FROM_LASER --index-na
 ```
 $ python search_laser_vectors.py --index YOUR_INDEX --embeddings EMBEDDINGS_YOU_WANT_TO_SEARCH --batch-size 16834 --neighbors 10 --output OUTPUT_FILE
 ```
-4. You will fetch the parallel sentences from the original text files using the just created scores file. Source sentences are those that you previously searched from the FAISS index and target sentences are the indexed ones.
+4. You will fetch the parallel sentences from the original text files using the just created scores file. Source sentences are those that you previously searched from the FAISS index and target sentences are the indexed ones. Notice that you can fetch more with the ```--number-of-parallel-sentences``` argument. Maximum number of sentences is k from the kNN you used.
 ```
-$ python fetch_parallel_sentences.py --score-file SCORE_FILE --source-sentences SOURCE_LANGUAGE_FILE --target-sentences TARGET_LANGUAGE_FILE --output OUTPUT_FILE
+$ python fetch_parallel_sentences.py --score-file SCORE_FILE --source-sentences SOURCE_LANGUAGE_FILE --target-sentences TARGET_LANGUAGE_FILE --number-of-parallel-sentences 1 --output OUTPUT_FILE
 ```
 5. Finally sort the parallel sentences file. The file looks likes this:
 ```
