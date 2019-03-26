@@ -12,9 +12,9 @@ This repository contains scripts to find parallel sentences from large amount of
 ```
 $ python create_faiss_index.py --embedding-file EMBEDDINGS_FROM_LASER --index-name NAME --batch-size 8192 --training-size 1500000
 ```
-3. Search embeddings from index. This step will perform kNN search for the embeddings you feed it from the previously created index. This script will output a score file containing euclidean distances and indices for the 10 nearest neighbors and margin score with the nearest neighbor. Note that this margin is different from the one used in LASER. We divide the distance of the nearest neighbor with the mean of the other 9. This way the one with the lower margin score should be better.
+3. Search embeddings from index. This step will perform kNN search for the embeddings you feed it from the previously created index. This script will output a score file containing euclidean distances and indices for the k nearest neighbors and margin score with the nearest neighbor. Note that this margin is different from the one used in LASER. We divide the distance of the nearest neighbor with the mean of the other k-1. This way the one with the lower margin score should be better.
 ```
-$ python search_laser_vectors.py --index YOUR_INDEX --embeddings EMBEDDINGS_YOU_WANT_TO_SEARCH --batch-size 16834 --output OUTPUT_FILE
+$ python search_laser_vectors.py --index YOUR_INDEX --embeddings EMBEDDINGS_YOU_WANT_TO_SEARCH --batch-size 16834 --neighbors 10 --output OUTPUT_FILE
 ```
 4. You will fetch the parallel sentences from the original text files using the just created scores file. Source sentences are those that you previously searched from the FAISS index and target sentences are the indexed ones.
 ```
