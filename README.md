@@ -8,9 +8,9 @@ This repository contains scripts to find parallel sentences from large amount of
 
 ## Steps
 1. Embed your text files using the [LASER](https://github.com/facebookresearch/LASER/tree/master/tasks/embed) library. Now you will have 1024 dimensional sentence vectors. This can take for a few days if you have tens of millions of sentences.
-2. Create FAISS index. The index I'm using is "OPQ32_128,IVF32768,PQ32". You can read more about those in the [FAISS wiki](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index). The embeddings you have gotten from LASER.
+2. Create FAISS index. The index I'm using is "OPQ32_128,IVF32768,PQ32". You can read more about those in the [FAISS wiki](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index). The embeddings you have gotten from LASER. To use GPU mark the ```--gpu``` argument with 1. CPU only put there 0.
 ```
-$ python create_faiss_index.py --embedding-file EMBEDDINGS_FROM_LASER --index-name NAME --batch-size 8192 --training-size 1500000
+$ python create_faiss_index.py --embedding-file EMBEDDINGS_FROM_LASER --index-name NAME --batch-size 8192 --training-size 1500000 --gpu 1
 ```
 3. Search embeddings from index. This step will perform kNN search for the embeddings you feed it from the previously created index. This script will output a score file containing euclidean distances and indices for the k nearest neighbors and margin score with the nearest neighbor. Note that this margin is different from the one used in LASER. We divide the distance of the nearest neighbor with the mean of the other k-1. This way the one with the lower margin score should be better.
 ```
